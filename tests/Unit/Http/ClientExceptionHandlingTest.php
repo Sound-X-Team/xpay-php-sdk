@@ -117,7 +117,7 @@ final class ClientExceptionHandlingTest extends TestCase
     public function testHandlesServerException(): void
     {
         $this->expectException(XPayException::class);
-        $this->expectExceptionMessage('Server error occurred');
+        $this->expectExceptionMessage('Internal server error');
 
         $client = $this->createClientWithMockResponses([
             new ServerException(
