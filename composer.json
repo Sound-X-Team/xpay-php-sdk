@@ -38,7 +38,10 @@
   "autoload": {
     "psr-4": {
       "XPay\\": "src/"
-    }
+    },
+    "classmap": [
+      "src/Exceptions/XPayExceptions.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {

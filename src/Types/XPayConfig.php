@@ -4,15 +4,27 @@ declare(strict_types=1);
 
 namespace XPay\Types;
 
-final readonly class XPayConfig
+final class XPayConfig
 {
+    public readonly string $apiKey;
+    public readonly ?string $merchantId;
+    public readonly string $environment;
+    public readonly ?string $baseUrl;
+    public readonly int $timeout;
+
     public function __construct(
-        public string $apiKey,
-        public ?string $merchantId = null,
-        public string $environment = 'sandbox',
-        public ?string $baseUrl = null,
-        public int $timeout = 30
+        string $apiKey,
+        ?string $merchantId = null,
+        string $environment = 'sandbox',
+        ?string $baseUrl = null,
+        int $timeout = 30
     ) {
+        $this->apiKey = $apiKey;
+        $this->merchantId = $merchantId;
+        $this->environment = $environment;
+        $this->baseUrl = $baseUrl;
+        $this->timeout = $timeout;
+
         if (empty($this->apiKey)) {
             throw new \InvalidArgumentException('API key is required');
         }

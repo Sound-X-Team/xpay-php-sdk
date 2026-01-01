@@ -1,15 +1,24 @@
 <?php return array(
     'root' => array(
-        'name' => 'xpay/php-sdk',
+        'name' => 'bits-devteam/xpay-php-sdk',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'a453733513601fb8b799ac8552dc562f5716cf2b',
+        'reference' => '8e2af646a0cbaaecf813475feb7c65c592bf69a9',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => true,
     ),
     'versions' => array(
+        'bits-devteam/xpay-php-sdk' => array(
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '8e2af646a0cbaaecf813475feb7c65c592bf69a9',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'brick/math' => array(
             'pretty_version' => '0.12.3',
             'version' => '0.12.3.0',
@@ -1495,15 +1504,6 @@
             'install_path' => __DIR__ . '/../voku/portable-ascii',
             'aliases' => array(),
             'dev_requirement' => true,
-        ),
-        'xpay/php-sdk' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
-            'reference' => 'a453733513601fb8b799ac8552dc562f5716cf2b',
-            'type' => 'library',
-            'install_path' => __DIR__ . '/../../',
-            'aliases' => array(),
-            'dev_requirement' => false,
         ),
     ),
 );

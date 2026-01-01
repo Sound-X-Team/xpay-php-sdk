@@ -21,9 +21,9 @@ final class FacadeTest extends TestCase
         $reflection = new \ReflectionClass(XPayFacade::class);
         $docComment = $reflection->getDocComment();
         
-        $this->assertStringContains('@method static \XPay\Resources\Payments payments()', $docComment);
-        $this->assertStringContains('@method static \XPay\Resources\Webhooks webhooks()', $docComment);
-        $this->assertStringContains('@method static \XPay\Resources\Customers customers()', $docComment);
-        $this->assertStringContains('@see \XPay\XPay', $docComment);
+        $this->assertStringContainsString('@method static \XPay\Resources\Payments payments()', $docComment);
+        $this->assertStringContainsString('@method static \XPay\Resources\Webhooks webhooks()', $docComment);
+        $this->assertStringContainsString('@method static \XPay\Resources\Customers customers()', $docComment);
+        $this->assertStringContainsString('@see \XPay\XPay', $docComment);
     }
 }

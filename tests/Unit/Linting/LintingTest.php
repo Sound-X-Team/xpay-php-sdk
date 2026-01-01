@@ -17,8 +17,8 @@ final class LintingTest extends TestCase
         $this->assertFileExists($configPath, 'PHPStan configuration file should exist');
         
         $content = file_get_contents($configPath);
-        $this->assertStringContains('level: 8', $content, 'PHPStan should be configured for level 8');
-        $this->assertStringContains('src', $content, 'PHPStan should analyze src directory');
+        $this->assertStringContainsString('level: 8', $content, 'PHPStan should be configured for level 8');
+        $this->assertStringContainsString('src', $content, 'PHPStan should analyze src directory');
     }
 
     public function testPhpCsFixerConfigurationExists(): void
@@ -27,8 +27,8 @@ final class LintingTest extends TestCase
         $this->assertFileExists($configPath, 'PHP CS Fixer configuration file should exist');
         
         $content = file_get_contents($configPath);
-        $this->assertStringContains('PSR12', $content, 'Should enforce PSR-12 standards');
-        $this->assertStringContains('src', $content, 'Should analyze src directory');
+        $this->assertStringContainsString('PSR12', $content, 'Should enforce PSR-12 standards');
+        $this->assertStringContainsString('src', $content, 'Should analyze src directory');
     }
 
     public function testMakefileExists(): void
@@ -37,9 +37,9 @@ final class LintingTest extends TestCase
         $this->assertFileExists($makefilePath, 'Makefile should exist for development commands');
         
         $content = file_get_contents($makefilePath);
-        $this->assertStringContains('lint:', $content, 'Makefile should have lint target');
-        $this->assertStringContains('test:', $content, 'Makefile should have test target');
-        $this->assertStringContains('phpstan:', $content, 'Makefile should have phpstan target');
+        $this->assertStringContainsString('lint:', $content, 'Makefile should have lint target');
+        $this->assertStringContainsString('test:', $content, 'Makefile should have test target');
+        $this->assertStringContainsString('phpstan:', $content, 'Makefile should have phpstan target');
     }
 
     public function testIdeHelperExists(): void
@@ -48,9 +48,9 @@ final class LintingTest extends TestCase
         $this->assertFileExists($helperPath, 'IDE helper file should exist');
         
         $content = file_get_contents($helperPath);
-        $this->assertStringContains('ClientInterface', $content, 'Should provide PSR HTTP client stubs');
-        $this->assertStringContains('Money\\Money', $content, 'Should provide Money library stubs');
-        $this->assertStringContains('Illuminate\\', $content, 'Should provide Laravel stubs');
+        $this->assertStringContainsString('ClientInterface', $content, 'Should provide PSR HTTP client stubs');
+        $this->assertStringContainsString('Money\\Money', $content, 'Should provide Money library stubs');
+        $this->assertStringContainsString('Illuminate\\', $content, 'Should provide Laravel stubs');
     }
 
     public function testComposerScriptsAreConfigured(): void
