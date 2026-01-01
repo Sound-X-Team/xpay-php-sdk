@@ -1,0 +1,35 @@
+name: Publish PHP SDK to Packagist
+
+on:
+  release:
+    types: [created]
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Execute Tests
+        run: vendor/bin/phpunit
+
+  publish:
+    name: Update Packagist
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Packagist Update
+        run: |
+          curl -XPOST \
+          -H 'content-type:application/json' \
+          'https://packagist.org/api/update-package?username=bits-devteam&apiToken=${{ secrets.PACKAGIST_TOKEN }}' \
+          -d '{"repository":{"url":"https://github.com/Sound-X-Team/xpay-php-sdk"}}'
