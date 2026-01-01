@@ -1,0 +1,21 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    excludePaths:
+        - ide-helper.php
+    ignoreErrors:
+        # Ignore Laravel-specific errors when Laravel is not installed
+        - '#Class Illuminate\\.*#'
+        - '#Function config not found#'
+        - '#Function abort not found#'
+        - '#Function env not found#'
+        - '#Function config_path not found#'
+        # Ignore Guzzle/PSR errors in development
+        - '#Class Psr\\Http\\.*#'
+        - '#Class GuzzleHttp\\.*#'
+        - '#Class Money\\.*#'
+    scanDirectories:
+        - vendor
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
