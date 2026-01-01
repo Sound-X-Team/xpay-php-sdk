@@ -37,9 +37,10 @@ final class XPay
 
   private function extractMerchantIdFromApiKey(string $apiKey): string
   {
-    // For now, use a default merchant ID or extract from API key structure
-    // In production, this would be handled by the backend or passed explicitly
-    return 'default';
+    // MerchantID must be provided explicitly in the config
+    throw new \InvalidArgumentException(
+      'Merchant ID is required. Get your merchant ID from the X-Pay dashboard.'
+    );
   }
 
   /**
