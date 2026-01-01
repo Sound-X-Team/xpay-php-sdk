@@ -1,0 +1,7 @@
+vendor/
+.phpunit.result.cache
+.php-cs-fixer.cache
+.idea/
+*.log
+Thumbs.db
+.DS_Store
