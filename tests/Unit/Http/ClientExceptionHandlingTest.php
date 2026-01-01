@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace XPay\Tests\Unit\Http;
 
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
 use XPay\Exceptions\AuthenticationException;
 use XPay\Exceptions\NetworkException;
 use XPay\Exceptions\PermissionException;
@@ -25,13 +26,20 @@ use XPay\Types\XPayConfig;
 
 final class ClientExceptionHandlingTest extends TestCase
 {
-    private ClientInterface $mockHttpClient;
     private XPayConfig $config;
 
     protected function setUp(): void
     {
-        $this->mockHttpClient = $this->createMock(ClientInterface::class);
         $this->config = new XPayConfig('test_api_key');
+    }
+
+    private function createClientWithMockResponses(array $responses): Client
+    {
+        $mock = new MockHandler($responses);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new GuzzleClient(['handler' => $handlerStack]);
+        
+        return new Client($this->config, $httpClient);
     }
 
     public function testHandlesConnectException(): void
@@ -39,13 +47,10 @@ final class ClientExceptionHandlingTest extends TestCase
         $this->expectException(NetworkException::class);
         $this->expectExceptionMessage('Failed to connect to X-Pay API');
 
-        $request = $this->createMock(RequestInterface::class);
-        $exception = new ConnectException('Connection failed', $request);
+        $client = $this->createClientWithMockResponses([
+            new ConnectException('Connection failed', new Request('GET', '/test'))
+        ]);
 
-        $this->mockHttpClient->method('request')
-            ->willThrowException($exception);
-
-        $client = new Client($this->config, $this->mockHttpClient);
         $client->get('/test');
     }
 
@@ -53,14 +58,14 @@ final class ClientExceptionHandlingTest extends TestCase
     {
         $this->expectException(ValidationException::class);
 
-        $request = $this->createMock(RequestInterface::class);
-        $response = $this->createMockResponse(400, '{"message": "Bad request"}');
-        $exception = new ClientException('Bad Request', $request, $response);
+        $client = $this->createClientWithMockResponses([
+            new ClientException(
+                'Bad Request',
+                new Request('GET', '/test'),
+                new Response(400, [], json_encode(['message' => 'Bad request']))
+            )
+        ]);
 
-        $this->mockHttpClient->method('request')
-            ->willThrowException($exception);
-
-        $client = new Client($this->config, $this->mockHttpClient);
         $client->get('/test');
     }
 
@@ -68,14 +73,14 @@ final class ClientExceptionHandlingTest extends TestCase
     {
         $this->expectException(AuthenticationException::class);
 
-        $request = $this->createMock(RequestInterface::class);
-        $response = $this->createMockResponse(401, '{"message": "Unauthorized"}');
-        $exception = new ClientException('Unauthorized', $request, $response);
+        $client = $this->createClientWithMockResponses([
+            new ClientException(
+                'Unauthorized',
+                new Request('GET', '/test'),
+                new Response(401, [], json_encode(['message' => 'Unauthorized']))
+            )
+        ]);
 
-        $this->mockHttpClient->method('request')
-            ->willThrowException($exception);
-
-        $client = new Client($this->config, $this->mockHttpClient);
         $client->get('/test');
     }
 
@@ -83,14 +88,14 @@ final class ClientExceptionHandlingTest extends TestCase
     {
         $this->expectException(PermissionException::class);
 
-        $request = $this->createMock(RequestInterface::class);
-        $response = $this->createMockResponse(403, '{"message": "Forbidden"}');
-        $exception = new ClientException('Forbidden', $request, $response);
+        $client = $this->createClientWithMockResponses([
+            new ClientException(
+                'Forbidden',
+                new Request('GET', '/test'),
+                new Response(403, [], json_encode(['message' => 'Forbidden']))
+            )
+        ]);
 
-        $this->mockHttpClient->method('request')
-            ->willThrowException($exception);
-
-        $client = new Client($this->config, $this->mockHttpClient);
         $client->get('/test');
     }
 
@@ -98,14 +103,14 @@ final class ClientExceptionHandlingTest extends TestCase
     {
         $this->expectException(ResourceNotFoundException::class);
 
-        $request = $this->createMock(RequestInterface::class);
-        $response = $this->createMockResponse(404, '{"message": "Not found"}');
-        $exception = new ClientException('Not Found', $request, $response);
+        $client = $this->createClientWithMockResponses([
+            new ClientException(
+                'Not Found',
+                new Request('GET', '/test'),
+                new Response(404, [], json_encode(['message' => 'Not found']))
+            )
+        ]);
 
-        $this->mockHttpClient->method('request')
-            ->willThrowException($exception);
-
-        $client = new Client($this->config, $this->mockHttpClient);
         $client->get('/test');
     }
 
@@ -114,14 +119,14 @@ final class ClientExceptionHandlingTest extends TestCase
         $this->expectException(XPayException::class);
         $this->expectExceptionMessage('Server error occurred');
 
-        $request = $this->createMock(RequestInterface::class);
-        $response = $this->createMockResponse(500, '{"message": "Internal server error", "error_code": "SERVER_ERROR"}');
-        $exception = new ServerException('Server Error', $request, $response);
+        $client = $this->createClientWithMockResponses([
+            new ServerException(
+                'Server Error',
+                new Request('GET', '/test'),
+                new Response(500, [], json_encode(['message' => 'Internal server error', 'error_code' => 'SERVER_ERROR']))
+            )
+        ]);
 
-        $this->mockHttpClient->method('request')
-            ->willThrowException($exception);
-
-        $client = new Client($this->config, $this->mockHttpClient);
         $client->get('/test');
     }
 
@@ -130,13 +135,10 @@ final class ClientExceptionHandlingTest extends TestCase
         $this->expectException(TimeoutException::class);
         $this->expectExceptionMessage('Request timeout');
 
-        $request = $this->createMock(RequestInterface::class);
-        $exception = new RequestException('timeout error occurred', $request);
+        $client = $this->createClientWithMockResponses([
+            new RequestException('timeout error occurred', new Request('GET', '/test'))
+        ]);
 
-        $this->mockHttpClient->method('request')
-            ->willThrowException($exception);
-
-        $client = new Client($this->config, $this->mockHttpClient);
         $client->get('/test');
     }
 
@@ -144,13 +146,10 @@ final class ClientExceptionHandlingTest extends TestCase
     {
         $this->expectException(NetworkException::class);
 
-        $request = $this->createMock(RequestInterface::class);
-        $exception = new RequestException('Generic request error', $request);
+        $client = $this->createClientWithMockResponses([
+            new RequestException('Generic request error', new Request('GET', '/test'))
+        ]);
 
-        $this->mockHttpClient->method('request')
-            ->willThrowException($exception);
-
-        $client = new Client($this->config, $this->mockHttpClient);
         $client->get('/test');
     }
 
@@ -159,32 +158,26 @@ final class ClientExceptionHandlingTest extends TestCase
         $this->expectException(XPayException::class);
         $this->expectExceptionMessage('Invalid JSON response');
 
-        $response = $this->createMock(ResponseInterface::class);
-        $stream = $this->createMock(StreamInterface::class);
-        
-        $stream->method('__toString')
-            ->willReturn('invalid json {');
-        
-        $response->method('getBody')
-            ->willReturn($stream);
+        $client = $this->createClientWithMockResponses([
+            new Response(200, [], 'invalid json {')
+        ]);
 
-        $this->mockHttpClient->method('request')
-            ->willReturn($response);
-
-        $client = new Client($this->config, $this->mockHttpClient);
         $client->get('/test');
     }
 
     public function testExceptionDetailsArePreserved(): void
     {
-        $request = $this->createMock(RequestInterface::class);
-        $response = $this->createMockResponse(400, '{"message": "Validation failed", "error_code": "VALIDATION_ERROR", "details": {"field": "amount"}}');
-        $exception = new ClientException('Bad Request', $request, $response);
-
-        $this->mockHttpClient->method('request')
-            ->willThrowException($exception);
-
-        $client = new Client($this->config, $this->mockHttpClient);
+        $client = $this->createClientWithMockResponses([
+            new ClientException(
+                'Bad Request',
+                new Request('GET', '/test'),
+                new Response(400, [], json_encode([
+                    'message' => 'Validation failed',
+                    'error_code' => 'VALIDATION_ERROR',
+                    'details' => ['field' => 'amount']
+                ]))
+            )
+        ]);
 
         try {
             $client->get('/test');
@@ -195,22 +188,5 @@ final class ClientExceptionHandlingTest extends TestCase
             $this->assertEquals(['field' => 'amount'], $e->getDetails()['details']);
             $this->assertEquals(400, $e->getHttpStatus());
         }
-    }
-
-    private function createMockResponse(int $statusCode, string $body): ResponseInterface
-    {
-        $response = $this->createMock(ResponseInterface::class);
-        $stream = $this->createMock(StreamInterface::class);
-        
-        $stream->method('__toString')
-            ->willReturn($body);
-        
-        $response->method('getStatusCode')
-            ->willReturn($statusCode);
-        
-        $response->method('getBody')
-            ->willReturn($stream);
-
-        return $response;
     }
 }

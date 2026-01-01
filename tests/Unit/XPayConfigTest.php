@@ -96,6 +96,6 @@ final class XPayConfigTest extends TestCase
     public function testGetBaseUrlDefault(): void
     {
         $config = new XPayConfig('test_key');
-        $this->assertEquals('http://localhost:8000', $config->getBaseUrl());
+        $this->assertEquals('https://server.xpay-bits.com', $config->getBaseUrl());
     }
 }

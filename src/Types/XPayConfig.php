@@ -32,12 +32,13 @@ final class XPayConfig
 
     public function getEnvironment(): string
     {
-        // Auto-detect environment from API key prefix if not explicitly set
-        if ($this->environment !== 'sandbox' && $this->environment !== 'live') {
-            return $this->detectEnvironmentFromApiKey();
+        // If explicitly set to something other than default 'sandbox', use that
+        if ($this->environment === 'live') {
+            return 'live';
         }
 
-        return $this->environment;
+        // Auto-detect environment from API key prefix
+        return $this->detectEnvironmentFromApiKey();
     }
 
     public function getBaseUrl(): string

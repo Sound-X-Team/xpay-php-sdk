@@ -12,7 +12,11 @@ final class FacadeTest extends TestCase
 {
     public function testFacadeAccessor(): void
     {
-        $accessor = XPayFacade::getFacadeAccessor();
+        // Use reflection to access protected method
+        $reflection = new \ReflectionMethod(XPayFacade::class, 'getFacadeAccessor');
+        $reflection->setAccessible(true);
+        
+        $accessor = $reflection->invoke(null);
         $this->assertEquals(XPay::class, $accessor);
     }
 
@@ -21,9 +25,9 @@ final class FacadeTest extends TestCase
         $reflection = new \ReflectionClass(XPayFacade::class);
         $docComment = $reflection->getDocComment();
         
-        $this->assertStringContainsString('@method static \XPay\Resources\Payments payments()', $docComment);
-        $this->assertStringContainsString('@method static \XPay\Resources\Webhooks webhooks()', $docComment);
-        $this->assertStringContainsString('@method static \XPay\Resources\Customers customers()', $docComment);
-        $this->assertStringContainsString('@see \XPay\XPay', $docComment);
+        $this->assertStringContainsString('@method static \\XPay\\Resources\\Payments payments()', $docComment);
+        $this->assertStringContainsString('@method static \\XPay\\Resources\\Webhooks webhooks()', $docComment);
+        $this->assertStringContainsString('@method static \\XPay\\Resources\\Customers customers()', $docComment);
+        $this->assertStringContainsString('@see \\XPay\\XPay', $docComment);
     }
 }
