@@ -49,7 +49,7 @@ final class LintingTest extends TestCase
         
         $content = file_get_contents($helperPath);
         $this->assertStringContainsString('ClientInterface', $content, 'Should provide PSR HTTP client stubs');
-        $this->assertStringContainsString('Money\\Money', $content, 'Should provide Money library stubs');
+        $this->assertStringContainsString('class Money', $content, 'Should provide Money library stubs');
         $this->assertStringContainsString('Illuminate\\', $content, 'Should provide Laravel stubs');
     }
 
